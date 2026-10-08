@@ -1,0 +1,109 @@
+/* SEWA Bill Tracker — "meter panel" theme.
+   Charcoal ground; one functional accent per fee category (as on the bill itself);
+   tabular mono digits for readings and amounts. */
+
+:root {
+  --ink: #12181B; --panel: #1A2125; --panel-raised: #212A2F; --hairline: #2E383D;
+  --paper: #E8EDE9; --muted: #8FA098; --faint: #6B7B75;
+  --electricity: #E8B93E; --water: #4CB2E8; --gas: #E8703E; --municipality: #5FAE72;
+  --electricity-dim: #6B5A22;
+  --danger: #D9695A; --radius: 3px;
+  --font-ui: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--ink); color: var(--paper); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+body { min-height: 100dvh; display: flex; flex-direction: column; font-size: 15px; line-height: 1.45; }
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+
+.app-header { padding: 18px 16px 14px; border-bottom: 1px solid var(--hairline); display: flex; align-items: baseline; justify-content: space-between; }
+.app-header .brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+.app-header .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--electricity); margin-right: 8px; }
+.app-header .subline { font-size: 11.5px; color: var(--faint); font-family: var(--font-mono); }
+
+.app-main { flex: 1; padding: 16px 16px 96px; max-width: 760px; width: 100%; margin: 0 auto; }
+.view { display: none; }
+.view.active { display: block; animation: fade-in .18s ease; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .view.active { animation: none; } }
+
+.tab-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--panel); border-top: 1px solid var(--hairline); padding-bottom: env(safe-area-inset-bottom, 0); z-index: 20; }
+.tab-btn { flex: 1; background: none; border: none; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--faint); cursor: pointer; border-top: 2px solid transparent; }
+.tab-btn svg { width: 20px; height: 20px; }
+.tab-btn span { font-size: 10.5px; }
+.tab-btn.active { color: var(--electricity); border-top-color: var(--electricity); }
+.tab-btn:focus-visible, .btn:focus-visible, .subtab-btn:focus-visible { outline: 2px solid var(--electricity); outline-offset: 2px; }
+
+@media (min-width: 760px) {
+  body { flex-direction: row; }
+  .app-header { display: none; }
+  .tab-bar { position: static; flex-direction: column; width: 200px; height: 100dvh; border-top: none; border-right: 1px solid var(--hairline); padding: 20px 0; justify-content: flex-start; gap: 4px; }
+  .tab-btn { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 11px 20px; border-top: none; border-left: 2px solid transparent; }
+  .tab-btn.active { border-left-color: var(--electricity); background: var(--panel-raised); }
+  .app-main { padding: 28px 32px 60px; }
+}
+
+.panel { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
+.panel-title { font-size: 12px; font-weight: 600; color: var(--faint); margin: 0 0 12px; }
+
+.util-card { background: var(--panel); border: 1px solid var(--hairline); border-top: 3px solid var(--hairline); border-radius: 0 0 var(--radius) var(--radius); padding: 14px; }
+.util-card.electricity { border-top-color: var(--electricity); } .util-card.water { border-top-color: var(--water); }
+.util-card.gas { border-top-color: var(--gas); } .util-card.municipality { border-top-color: var(--municipality); }
+.util-name { font-size: 12.5px; font-weight: 600; margin-bottom: 6px; }
+.electricity .util-name { color: var(--electricity); } .water .util-name { color: var(--water); }
+.gas .util-name { color: var(--gas); } .municipality .util-name { color: var(--municipality); }
+.big-figure { font-family: var(--font-mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.big-figure .unit { font-size: 12px; color: var(--muted); font-family: var(--font-ui); margin-left: 4px; }
+.sub-figure { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 4px; }
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+@media (min-width: 560px) { .card-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: var(--radius); border: 1px solid var(--hairline); background: var(--panel-raised); color: var(--paper); cursor: pointer; font-weight: 600; font-size: 13.5px; }
+.btn:hover { border-color: var(--muted); }
+.btn-primary { background: var(--electricity); color: #1A1300; border-color: var(--electricity); }
+.btn-primary:hover { border-color: var(--electricity); filter: brightness(1.06); }
+.btn-danger { color: var(--danger); } .btn-block { width: 100%; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-ghost { background: none; border-color: transparent; color: var(--muted); }
+.btn-sm { padding: 5px 9px; font-size: 12px; }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 12px; color: var(--faint); margin-bottom: 5px; }
+.field input, .field select, .field textarea { width: 100%; background: var(--ink); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 9px 10px; color: var(--paper); font-family: var(--font-mono); }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--electricity); }
+.field textarea { min-height: 120px; resize: vertical; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.upload-zone { display: block; border: 1px dashed var(--hairline); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); cursor: pointer; }
+.upload-zone:hover { border-color: var(--electricity); color: var(--paper); }
+.upload-zone input[type=file] { display: none; }
+
+.subtabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.subtab-btn { flex: 1; padding: 9px; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; }
+.subtab-btn.active { color: #1A1300; background: var(--electricity); border-color: var(--electricity); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th, td { padding: 8px 10px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--hairline); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+th { font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; color: var(--faint); background: var(--panel); }
+tbody tr:hover { background: var(--panel-raised); } tbody tr:last-child td { border-bottom: none; }
+td.month-cell { font-family: var(--font-ui); font-weight: 600; }
+td.util-tag { font-family: var(--font-ui); font-size: 12px; font-weight: 600; }
+td.util-tag.electricity { color: var(--electricity); } td.util-tag.water { color: var(--water); } td.util-tag.gas { color: var(--gas); }
+
+.empty-state { text-align: center; padding: 48px 16px; color: var(--faint); }
+.empty-state p { max-width: 280px; margin: 4px auto 0; font-size: 13px; }
+.review-banner { background: var(--panel-raised); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 10px 12px; font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+.review-banner.warn { border-color: var(--gas); color: var(--gas); }
+
+.toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--panel-raised); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 10px 16px; font-size: 13px; opacity: 0; transition: all .2s ease; pointer-events: none; z-index: 50; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (min-width: 760px) { .toast { bottom: 24px; } }
+
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.section-head h1 { font-size: 18px; margin: 0; font-weight: 700; }
+.section-head .meta { font-size: 12px; color: var(--faint); font-family: var(--font-mono); }
+.trend-row { display: flex; align-items: flex-end; gap: 3px; height: 44px; margin-top: 12px; }
+.trend-bar { flex: 1; border-radius: 1px 1px 0 0; min-height: 2px; background: var(--electricity-dim); }
+.trend-bar:last-child { background: var(--electricity); }
+hr.hairline { border: none; border-top: 1px solid var(--hairline); margin: 8px 0; }
