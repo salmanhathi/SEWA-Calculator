@@ -68,8 +68,8 @@ function showView(name) {
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-  if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  showView('dashboard');
+  if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'lib/pdf.worker.min.js';
+  showView(Store.list().length ? 'dashboard' : 'add');
 });
 
 // ---------------- Records ----------------
@@ -287,7 +287,7 @@ function initCalcState() {
     const lu = last ? last.utilities[k] : {};
     st.utils[k] = {
       prevDate: (lu.currentReadingDate && lu.currentReadingDate.iso) || '', curDate: '',
-      prevReading: lu.currentReading != null ? lu.currentReading : '', curReading: '',
+      prevReading: lu.currentReading != null ? lu.currentReading : '', consumption: '',
       mf: lu.mf != null ? lu.mf : t[k].mf, rate: lu.rate != null ? lu.rate : t[k].rate, svcPerDay: t[k].svcPerDay
     };
   });
@@ -298,12 +298,13 @@ function renderCalculator(body) {
   const st = calcState;
   const f = (k, field, label, type = 'number', step = 'any') =>
     `<div class="field"><label>${label}</label><input data-calc="${k}.${field}" type="${type}" ${type === 'number' ? `step="${step}"` : ''} value="${st.utils[k][field]}"></div>`;
+  const hasPrev = k => !!st.utils[k].prevDate;
   body.innerHTML = `
-    <div class="review-banner">Enter reading dates and meter readings — charges are worked out as you type. Previous readings are pre-filled from your last saved bill.</div>
+    <div class="review-banner">Enter the reading date and the consumption for each meter — everything else is worked out as you type. The previous date and reading come from your last saved bill.</div>
     <div class="panel"><div class="field" style="margin:0"><label>Month (defaults to the electricity reading month)</label><input id="calc-monthKey" value="${st.monthKey}"></div></div>
     ${UTIL_KEYS.map(k => `<div class="panel"><div class="panel-title" style="color:var(--${k})">${UTIL_LABEL[k]}</div>
-      <div class="field-row">${f(k, 'prevDate', 'Previous reading date', 'date')}${f(k, 'curDate', 'Current reading date', 'date')}</div>
-      <div class="field-row">${f(k, 'prevReading', 'Previous reading')}${f(k, 'curReading', 'Current reading')}</div>
+      ${hasPrev(k) ? '' : `<div class="field-row">${f(k, 'prevDate', 'Previous reading date', 'date')}${f(k, 'prevReading', 'Previous reading (optional)')}</div>`}
+      <div class="field-row">${f(k, 'curDate', 'Current reading date', 'date')}${f(k, 'consumption', 'Consumption (billed units)')}</div>
       <details style="margin-bottom:10px"><summary style="cursor:pointer;color:var(--faint);font-size:12.5px">Tariff for ${UTIL_LABEL[k].toLowerCase()}</summary>
         <div class="field-row" style="margin-top:10px">${f(k, 'mf', 'MF')}${f(k, 'rate', 'Rate', 'number', '0.0001')}</div>
         <div class="field-row">${f(k, 'svcPerDay', 'Service charge per day', 'number', '0.0001')}
@@ -335,10 +336,11 @@ function computeCalc() {
   UTIL_KEYS.forEach(k => {
     const u = st.utils[k];
     const days = daysBetween(u.curDate, u.prevDate);
-    const diff = u.curReading === '' || u.prevReading === '' ? null : Number(u.curReading) - Number(u.prevReading);
-    const row = { days, consumption: null, currentAmount: null, svc: null, net: null, vat: null, total: null, perDay: null };
-    if (diff !== null && !isNaN(diff)) {
-      row.consumption = Math.round(diff * Number(u.mf) * 1000) / 1000;
+    const cons = u.consumption === '' ? null : Number(u.consumption);
+    const row = { days, consumption: null, curReading: null, currentAmount: null, svc: null, net: null, vat: null, total: null, perDay: null };
+    if (cons !== null && !isNaN(cons)) {
+      row.consumption = cons;
+      if (u.prevReading !== '' && Number(u.mf)) row.curReading = Math.round((Number(u.prevReading) + cons / Number(u.mf)) * 1000) / 1000;
       row.currentAmount = r2(row.consumption * Number(u.rate));
       const ov = st.svcOverride[k];
       row.svc = ov != null ? ov : (days ? r2(days * Number(u.svcPerDay)) : null);
@@ -366,8 +368,8 @@ function updateCalcResults() {
   UTIL_KEYS.forEach(k => {
     const r = c.utils[k], el = document.getElementById('res-' + k);
     if (!el) return;
-    el.innerHTML = r.total === null ? `<div style="color:var(--faint);font-size:12.5px">Enter both dates and both readings to see the charges.</div>` :
-      `<hr class="hairline">${line('Days', r.days)}${line('Consumption', fmtNum(r.consumption))}${line('Current amount', fmtMoney(r.currentAmount))}${line('Service charges', fmtMoney(r.svc))}${line('VAT ' + st.vat + '%', fmtMoney(r.vat))}${line('Total (inc VAT)', fmtMoney(r.total), true)}${line('Per day', fmtMoney(r.perDay))}`;
+    el.innerHTML = r.total === null ? `<div style="color:var(--faint);font-size:12.5px">Enter the reading date and consumption to see the charges.</div>` :
+      `<hr class="hairline">${line('Days', r.days)}${line('Consumption', fmtNum(r.consumption))}${r.curReading != null ? line('Current reading', fmtNum(r.curReading)) : ''}${line('Current amount', fmtMoney(r.currentAmount))}${line('Service charges', fmtMoney(r.svc))}${line('VAT ' + st.vat + '%', fmtMoney(r.vat))}${line('Total (inc VAT)', fmtMoney(r.total), true)}${line('Per day', fmtMoney(r.perDay))}`;
   });
   const m = document.getElementById('res-muni');
   if (m) m.innerHTML = c.grand == null ? `<div style="color:var(--faint);font-size:12.5px">Complete all three utilities to see municipality charges and the grand total.</div>` :
@@ -375,7 +377,7 @@ function updateCalcResults() {
 }
 function saveCalcRecord() {
   const st = calcState, c = computeCalc();
-  if (c.grand == null) { toast('Complete dates and readings for all three utilities'); return; }
+  if (c.grand == null) { toast('Enter the date and consumption for all three utilities'); return; }
   const monthKey = st.monthKey || monthKeyFromIso(st.utils.electricity.curDate);
   if (Store.get(monthKey) && !confirm(`A bill for ${monthKey} already exists. Overwrite it?`)) return;
   const last = Store.list().filter(r => r.monthKey !== monthKey).slice(-1)[0];
@@ -387,7 +389,7 @@ function saveCalcRecord() {
       currentReadingDate: { iso: u.curDate, display: isoToDisplay(u.curDate) },
       previousReadingDate: { iso: u.prevDate, display: isoToDisplay(u.prevDate) },
       consumption: r.consumption, rate: Number(u.rate), mf: Number(u.mf),
-      currentReading: Number(u.curReading), previousReading: Number(u.prevReading),
+      currentReading: r.curReading, previousReading: u.prevReading === '' ? null : Number(u.prevReading),
       meterNumber: last ? last.utilities[k].meterNumber : null,
       currentAmount: r.currentAmount, serviceCharges: r.svc, netTaxableAmount: r.net, vatRate: st.vat,
       vatAmount: r.vat, totalIncludingVAT: r.total, daysBetween: r.days, perDayCharges: r.perDay

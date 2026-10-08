@@ -1,10 +1,8 @@
-const CACHE_NAME = 'sewa-tracker-v2';
+const CACHE_NAME = 'sewa-tracker-v3';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './parser.js', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+  './lib/pdf.min.js', './lib/pdf.worker.min.js', './lib/xlsx.full.min.js'
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => Promise.all(ASSETS.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));

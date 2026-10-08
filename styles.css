@@ -3,13 +3,13 @@
    tabular mono digits for readings and amounts. */
 
 :root {
-  --ink: #12181B; --panel: #1A2125; --panel-raised: #212A2F; --hairline: #2E383D;
+  --ink: #0F1713; --panel: #16201B; --panel-raised: #1D2924; --hairline: #2B3A33;
   --paper: #E8EDE9; --muted: #8FA098; --faint: #6B7B75;
-  --electricity: #E8B93E; --water: #4CB2E8; --gas: #E8703E; --municipality: #5FAE72;
-  --electricity-dim: #6B5A22;
+  --brand: #3DB36B; --brand-dim: #25623D; --electricity: #E8B93E; --water: #4CB2E8; --gas: #E8703E; --municipality: #B58CE6;
+  
   --danger: #D9695A; --radius: 3px;
-  --font-ui: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, Consolas, monospace;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: var(--ink); color: var(--paper); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
@@ -18,7 +18,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 
 .app-header { padding: 18px 16px 14px; border-bottom: 1px solid var(--hairline); display: flex; align-items: baseline; justify-content: space-between; }
 .app-header .brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
-.app-header .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--electricity); margin-right: 8px; }
+.app-header .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); margin-right: 8px; }
 .app-header .subline { font-size: 11.5px; color: var(--faint); font-family: var(--font-mono); }
 
 .app-main { flex: 1; padding: 16px 16px 96px; max-width: 760px; width: 100%; margin: 0 auto; }
@@ -31,15 +31,15 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .tab-btn { flex: 1; background: none; border: none; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--faint); cursor: pointer; border-top: 2px solid transparent; }
 .tab-btn svg { width: 20px; height: 20px; }
 .tab-btn span { font-size: 10.5px; }
-.tab-btn.active { color: var(--electricity); border-top-color: var(--electricity); }
-.tab-btn:focus-visible, .btn:focus-visible, .subtab-btn:focus-visible { outline: 2px solid var(--electricity); outline-offset: 2px; }
+.tab-btn.active { color: var(--brand); border-top-color: var(--brand); }
+.tab-btn:focus-visible, .btn:focus-visible, .subtab-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 @media (min-width: 760px) {
   body { flex-direction: row; }
   .app-header { display: none; }
   .tab-bar { position: static; flex-direction: column; width: 200px; height: 100dvh; border-top: none; border-right: 1px solid var(--hairline); padding: 20px 0; justify-content: flex-start; gap: 4px; }
   .tab-btn { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 11px 20px; border-top: none; border-left: 2px solid transparent; }
-  .tab-btn.active { border-left-color: var(--electricity); background: var(--panel-raised); }
+  .tab-btn.active { border-left-color: var(--brand); background: var(--panel-raised); }
   .app-main { padding: 28px 32px 60px; }
 }
 
@@ -60,8 +60,8 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: var(--radius); border: 1px solid var(--hairline); background: var(--panel-raised); color: var(--paper); cursor: pointer; font-weight: 600; font-size: 13.5px; }
 .btn:hover { border-color: var(--muted); }
-.btn-primary { background: var(--electricity); color: #1A1300; border-color: var(--electricity); }
-.btn-primary:hover { border-color: var(--electricity); filter: brightness(1.06); }
+.btn-primary { background: var(--brand); color: #06140B; border-color: var(--brand); }
+.btn-primary:hover { border-color: var(--brand); filter: brightness(1.06); }
 .btn-danger { color: var(--danger); } .btn-block { width: 100%; }
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn-ghost { background: none; border-color: transparent; color: var(--muted); }
@@ -70,17 +70,17 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .field { margin-bottom: 12px; }
 .field label { display: block; font-size: 12px; color: var(--faint); margin-bottom: 5px; }
 .field input, .field select, .field textarea { width: 100%; background: var(--ink); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 9px 10px; color: var(--paper); font-family: var(--font-mono); }
-.field input:focus, .field textarea:focus { outline: none; border-color: var(--electricity); }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--brand); }
 .field textarea { min-height: 120px; resize: vertical; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .upload-zone { display: block; border: 1px dashed var(--hairline); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); cursor: pointer; }
-.upload-zone:hover { border-color: var(--electricity); color: var(--paper); }
+.upload-zone:hover { border-color: var(--brand); color: var(--paper); }
 .upload-zone input[type=file] { display: none; }
 
 .subtabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .subtab-btn { flex: 1; padding: 9px; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; }
-.subtab-btn.active { color: #1A1300; background: var(--electricity); border-color: var(--electricity); }
+.subtab-btn.active { color: #06140B; background: var(--brand); border-color: var(--brand); }
 
 .table-wrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: var(--radius); }
 table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
@@ -104,6 +104,6 @@ td.util-tag.electricity { color: var(--electricity); } td.util-tag.water { color
 .section-head h1 { font-size: 18px; margin: 0; font-weight: 700; }
 .section-head .meta { font-size: 12px; color: var(--faint); font-family: var(--font-mono); }
 .trend-row { display: flex; align-items: flex-end; gap: 3px; height: 44px; margin-top: 12px; }
-.trend-bar { flex: 1; border-radius: 1px 1px 0 0; min-height: 2px; background: var(--electricity-dim); }
-.trend-bar:last-child { background: var(--electricity); }
+.trend-bar { flex: 1; border-radius: 1px 1px 0 0; min-height: 2px; background: var(--brand-dim); }
+.trend-bar:last-child { background: var(--brand); }
 hr.hairline { border: none; border-top: 1px solid var(--hairline); margin: 8px 0; }
